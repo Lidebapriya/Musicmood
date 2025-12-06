@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MoodWave – AI Mood Music Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-main: #050316;
+      --bg-card: #110b2b;
+      --bg-card-soft: #171035;
+      --accent: #7b5cff;
+      --accent-soft: #a07cff;
+      --accent-strong: #ff5cf7;
+      --text-main: #f8f5ff;
+      --text-muted: #b4a9e6;
+      --border-soft: #2b2149;
+      --error: #ff4b6a;
+      --success: #5cffba;
+      --radius-lg: 18px;
+      --shadow-soft: 0 18px 45px rgba(0,0,0,0.55);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #281a5b 0, #050316 45%, #02010a 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 16px;
+    }
+
+    .app-shell {
+      max-width: 1120px;
+      width: 100%;
+      background: radial-gradient(circle at top left, #231540, #050316 55%);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header / nav */
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px 10px 22px;
+      border-bottom: 1px solid var(--border-soft);
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to right, rgba(5,3,22,0.9), rgba(9,5,40,0.92));
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-orb {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #ffe8ff 0, #ff5cf7 30%, #7b5cff 75%);
+      box-shadow: 0 0 25px rgba(123,92,255,0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-orb::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.55);
+      opacity: 0.8;
+    }
+
+    .logo-text-main {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      font-size: 1.05rem;
+    }
+
+    .logo-sub {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .tag-chip {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(12,6,40,0.75);
+    }
+
+    .tag-chip span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(92,255,186,0.7);
+    }
+
+    /* Layout main */
+
+    .app-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 0;
+      min-height: 520px;
+    }
+
+    @media (max-width: 880px) {
+      .app-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left: controls */
+
+    .panel-left {
+      padding: 18px 18px 20px 18px;
+      border-right: 1px solid var(--border-soft);
+      background: radial-gradient(circle at top left, rgba(255,92,247,0.12), transparent 55%);
+    }
+
+    @media (max-width: 880px) {
+      .panel-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+      }
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      border: 1px solid transparent;
+      background: rgba(11,5,40,0.9);
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    .tab-pill.active {
+      border-color: rgba(255,255,255,0.2);
+      background: linear-gradient(to right, #7b5cff, #ff5cf7);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(123,92,255,0.6);
+    }
+
+    .field-group {
+      margin-bottom: 12px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .field-label strong {
+      color: #fdfbff;
+      font-weight: 500;
+    }
+
+    .helper {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    textarea,
+    select,
+    input[type="range"],
+    input[type="text"] {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      background: rgba(10,5,37,0.94);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.83rem;
+      padding: 9px 11px;
+      outline: none;
+      transition: border var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    select:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(123,92,255,0.4);
+      background: rgba(18,10,60,0.98);
+      transform: translateY(-1px);
+    }
+
+    select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #d8cffc 50%), linear-gradient(135deg, #d8cffc 50%, transparent 50%);
+      background-position: calc(100% - 14px) 55%, calc(100% - 9px) 55%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .inline-select-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inline-select-row > * {
+      flex: 1;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 5px;
+      background: #241a51;
+      border-radius: 999px;
+      padding: 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff, #ff5cf7 35%, #7b5cff 80%);
+      box-shadow: 0 0 10px rgba(255,92,247,0.8);
+      cursor: pointer;
+      border: none;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      height: 15px;
+      width: 15px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff, #ff5cf7 35%, #7b5cff 80%);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,92,247,0.8);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 12px 0;
+    }
+
+    .badge-toggle {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      padding: 4px 9px;
+      background: rgba(9,4,34,0.9);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition-fast), border var(--transition-fast), transform var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .badge-toggle.active {
+      background: radial-gradient(circle at top left, #7b5cff, #ff5cf7);
+      border-color: rgba(255,255,255,0.55);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(132,96,255,0.8);
+      transform: translateY(-1px);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.84rem;
+      padding: 9px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7b5cff, #ff5cf7);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(123,92,255,0.7);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 26px rgba(123,92,255,0.9);
+    }
+
+    .btn-secondary {
+      background: rgba(10,5,40,0.95);
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(17,10,60,0.98);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    /* Right panel */
+
+    .panel-right {
+      padding: 18px 18px 20px 18px;
+      background: radial-gradient(circle at top right, rgba(123,92,255,0.26), transparent 55%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-right::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 120% 0%, rgba(255,92,247,0.18), transparent 50%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .panel-right-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .step-card {
+      background: rgba(9,4,34,0.9);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 9px 11px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .step-main {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .step-title {
+      font-weight: 500;
+      font-size: 0.8rem;
+    }
+
+    .step-caption {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .step-number {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      background: rgba(5,3,20,0.9);
+    }
+
+    /* Results */
+
+    .results-shell {
+      margin-top: 4px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 10px;
+      height: 100%;
+      min-height: 250px;
+    }
+
+    @media (max-width: 880px) {
+      .results-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(7,3,30,0.96);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 11px 11px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.55);
+      min-height: 0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.68rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      overflow-y: auto;
+      max-height: 260px;
+      padding-right: 2px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .meta-item {
+      font-size: 0.68rem;
+      background: rgba(13,8,42,0.95);
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .playlist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .playlist-item {
+      border-radius: 12px;
+      padding: 6px 7px;
+      background: rgba(10,6,39,0.92);
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border var(--transition-fast), background var(--transition-fast);
+    }
+
+    .playlist-item:hover {
+      transform: translateY(-1px);
+      background: rgba(15,9,55,0.98);
+      border-color: rgba(123,92,255,0.6);
+      box-shadow: 0 9px 18px rgba(0,0,0,0.5);
+    }
+
+    .playlist-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .playlist-name {
+      font-size: 0.8rem;
+      color: #fdfbff;
+    }
+
+    .playlist-platform {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .playlist-mood {
+      font-size: 0.7rem;
+      color: var(--accent-soft);
+    }
+
+    .playlist-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .lyrics-block {
+      white-space: pre-line;
+      margin-top: 4px;
+    }
+
+    .subtle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .badge-status {
+      font-size: 0.7rem;
+      color: var(--success);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 9px rgba(92,255,186,0.9);
+    }
+
+    .error-text {
+      color: var(--error);
+      font-size: 0.72rem;
+      margin-top: 4px;
+    }
+
+    .footer-note {
+      padding: 6px 18px 10px 18px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .footer-note span {
+      opacity: 0.9;
+    }
+
+    .link-muted {
+      color: var(--accent-soft);
+      text-decoration: none;
+    }
+
+    .link-muted:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-wrap">
+        <div class="logo-orb"></div>
+        <div>
+          <div class="logo-text-main">MoodWave</div>
+          <div class="logo-sub">AI Mood Music Studio</div>
+        </div>
+      </div>
+      <div class="tag-chip">
+        <span class="dot"></span>
+        <span>Realtime mood → music engine</span>
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <main class="app-main">
+      <!-- Left: input controls -->
+      <section class="panel-left">
+        <div class="tab-row">
+          <div class="tab-pill active">Advanced</div>
+          <div class="tab-pill">Quick</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <strong>Describe your mood</strong>
+            <span class="helper">You can use words, emoji, or a tiny story.</span>
+          </div>
+          <textarea id="moodText" placeholder="Example: softly hopeful, studying at 2am during rain, feeling a little nostalgic but peaceful..."></textarea>
+        </div>
+
+        <div class="field-group inline-select-row">
+          <div>
+            <div class="field-label">
+              <strong>Core vibe</strong>
+            </div>
+            <select id="moodType">
+              <option value="calm">Calm / Lo-fi</option>
+              <option value="happy">Bright / Happy</option>
+              <option value="sad">Soft / Sad</option>
+              <option value="focus">Deep Focus</option>
+              <option value="hype">Hype / Party</option>
+              <option value="romantic">Romantic</option>
+              <option value="dark">Dark / Cinematic</option>
+            </select>
+          </div>
+          <div>
+            <div class="field-label">
+              <strong>Activity</strong>
+            </div>
+            <select id="activity">
+              <option value="studying">Studying / Work</option>
+              <option value="walking">Walking / Travel</option>
+              <option value="gaming">Gaming</option>
+              <option value="crying">Crying / Healing</option>
+              <option value="sleep">Falling asleep</option>
+              <option value="party">House party</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <strong>Energy</strong>
+            <span class="helper"><span id="energyValue">4</span>/10</span>
+          </div>
+          <div class="slider-row">
+            <input type="range" id="energy" min="1" max="10" value="4" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <strong>What do you need right now?</strong>
+          </div>
+          <div class="badge-row" id="intentBadges">
+            <button class="badge-toggle active" data-intent="focus">Deep focus</button>
+            <button class="badge-toggle" data-intent="vibe">Just vibing</button>
+            <button class="badge-toggle" data-intent="dance">Dance / move</button>
+            <button class="badge-toggle" data-intent="sleep">Sleep / calm down</button>
+            <button class="badge-toggle" data-intent="heal">Emotional healing</button>
+            <button class="badge-toggle" data-intent="create">Creative flow</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <strong>Optional: custom title</strong>
+            <span class="helper">We’ll evolve it into an AI track idea.</span>
+          </div>
+          <input type="text" id="songTitleInput" placeholder="Ex: Midnight Library of My Thoughts" />
+        </div>
+
+        <div id="formError" class="error-text" style="display:none;"></div>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="btnGeneratePlaylists">
+            <span class="btn-icon">🎧</span>
+            Generate mood playlists
+          </button>
+          <button class="btn btn-secondary" id="btnGenerateTrack">
+            <span class="btn-icon">✨</span>
+            Create AI track concept
+          </button>
+        </div>
+      </section>
+
+      <!-- Right: Steps + results -->
+      <section class="panel-right">
+        <div class="panel-right-inner">
+          <div class="step-list">
+            <div class="step-card">
+              <div class="step-main">
+                <div class="step-title">Step 1 · Tell us your mood</div>
+                <div class="step-caption">Type a feeling, context, or emoji storm. We read the emotional signal.</div>
+              </div>
+              <div class="step-number">1</div>
+            </div>
+            <div class="step-card">
+              <div class="step-main">
+                <div class="step-title">Step 2 · Tune your vibe</div>
+                <div class="step-caption">Choose energy + activity. Our engine maps it to tempo, genre, and texture.</div>
+              </div>
+              <div class="step-number">2</div>
+            </div>
+            <div class="step-card">
+              <div class="step-main">
+                <div class="step-title">Step 3 · Play or create</div>
+                <div class="step-caption">Hit generate to get live playlists & an AI-ready track concept.</div>
+              </div>
+              <div class="step-number">3</div>
+            </div>
+          </div>
+
+          <div class="results-shell">
+            <!-- Playlists -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Mood-matched playlists</div>
+                  <div class="subtle" id="playlistSummary">Tell us your mood to unlock curated journeys.</div>
+                </div>
+                <div class="pill">
+                  <span class="badge-status-dot"></span>
+                  <span style="margin-left:4px;">Live internet links</span>
+                </div>
+              </div>
+              <div class="card-body" id="playlistResults">
+                <div class="empty-state">
+                  No playlists yet. Describe your mood and click
+                  <strong>Generate mood playlists</strong>. We’ll send you to matching YouTube & Spotify journeys.
+                </div>
+              </div>
+            </div>
+
+            <!-- AI track concept -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">AI track concept</div>
+                  <div class="subtle" id="trackSummary">We’ll turn your feeling into a track blueprint for any AI music tool.</div>
+                </div>
+                <div class="pill">Blueprint · not audio (yet)</div>
+              </div>
+              <div class="card-body" id="trackResults">
+                <div class="empty-state">
+                  Click <strong>Create AI track concept</strong> to generate:
+                  <ul style="margin-top:4px; padding-left:16px;">
+                    <li>Track title & mood tags</li>
+                    <li>Genre, tempo & sound palette</li>
+                    <li>A short lyric sketch</li>
+                    <li>A ready-to-paste prompt for AI music generators</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-note">
+      <span>Tip: Paste the AI prompt into any music model (Suno, Udio, etc.) to instantly hear your mood.</span>
+      <span>Built for experimental listening rooms & digital creators.</span>
+    </footer>
+  </div>
+
+  <script>
+    // ------- Utility data -------
+
+    const moodProfiles = {
+      calm: {
+        label: "Calm / Lo-fi",
+        genres: ["lo-fi hip hop", "chillhop", "ambient electronica"],
+        tempo: "70–90 BPM",
+        textures: "soft drums, vinyl crackle, warm keys, gentle pads",
+        youtubeQuery: "lofi chill beats to relax study to",
+        spotifyQuery: "lofi chill study beats playlist"
+      },
+      happy: {
+        label: "Bright / Happy",
+        genres: ["indie pop", "k-pop", "dance pop"],
+        tempo: "100–125 BPM",
+        textures: "bouncy drums, bright synths, handclaps, clean guitar",
+        youtubeQuery: "happy upbeat feel good playlist",
+        spotifyQuery: "feel good happy hits playlist"
+      },
+      sad: {
+        label: "Soft / Sad",
+        genres: ["piano ballad", "indie folk", "sad lo-fi"],
+        tempo: "60–80 BPM",
+        textures: "soft piano, reverb vocals, light strings, subtle noise",
+        youtubeQuery: "sad emotional songs playlist",
+        spotifyQuery: "sad chill songs playlist"
+      },
+      focus: {
+        label: "Deep Focus",
+        genres: ["ambient", "post-rock", "minimal techno"],
+        tempo: "60–110 BPM (subtle)",
+        textures: "no vocals, evolving pads, muted drums, texture loops",
+        youtubeQuery: "deep focus no lyrics playlist",
+        spotifyQuery: "deep focus concentration playlist"
+      },
+      hype: {
+        label: "Hype / Party",
+        genres: ["edm", "trap", "hyperpop"],
+        tempo: "125–150 BPM",
+        textures: "heavy bass, big drums, bright leads, hype vocals",
+        youtubeQuery: "party bangers edm trap playlist",
+        spotifyQuery: "party hype hits playlist"
+      },
+      romantic: {
+        label: "Romantic",
+        genres: ["r&b", "soft pop", "acoustic love"],
+        tempo: "70–100 BPM",
+        textures: "smooth bass, warm pads, intimate vocals, soft percussion",
+        youtubeQuery: "romantic love songs playlist",
+        spotifyQuery: "slow romantic songs playlist"
+      },
+      dark: {
+        label: "Dark / Cinematic",
+        genres: ["cinematic", "dark synthwave", "trap metal"],
+        tempo: "70–130 BPM",
+        textures: "deep bass, ominous pads, strings, heavy drums",
+        youtubeQuery: "dark cinematic music playlist",
+        spotifyQuery: "dark cinematic epic playlist"
+      }
+    };
+
+    const intentFlavors = {
+      focus: "no lyrics, stable groove, low distraction",
+      vibe: "catchy hooks, subtle vocals, soft movement",
+      dance: "forward drums, strong drops, high energy",
+      sleep: "very soft dynamics, slow tempos, no sudden changes",
+      heal: "emotional harmony, safe lyrics, slow build",
+      create: "textures and loops that leave space for ideas"
+    };
+
+    const lyricFragments = {
+      calm: [
+        "raindrops on my open notes",
+        "pixels blur but my mind still floats",
+        "quiet storms inside my head",
+        "coffee rings on words unsaid"
+      ],
+      happy: [
+        "neon skies above the street",
+        "dancing where the daylight meets",
+        "every step a little spark",
+        "laughing louder than the dark"
+      ],
+      sad: [
+        "ink runs where my secrets sleep",
+        "I fold the night and try to keep",
+        "names that echo in the rain",
+        "soft goodbyes that taste like pain"
+      ],
+      focus: [
+        "numbers hum in steady lines",
+        "circuits sing in quiet time",
+        "heartbeat set to metronome",
+        "build a universe at home"
+      ],
+      hype: [
+        "bassline shakes the silver floor",
+        "we were ghosts but now we roar",
+        "city lights in overdrive",
+        "every glitch is still alive"
+      ],
+      romantic: [
+        "fingers tracing starry maps",
+        "constellations in your laugh",
+        "you say nothing, I still hear",
+        "every future pulling near"
+      ],
+      dark: [
+        "shadows write across the glass",
+        "seconds drip but never pass",
+        "sirens fade in violet haze",
+        "we are stories set ablaze"
+      ]
+    };
+
+    // ------- Helpers -------
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function getSelectedIntent() {
+      const active = document.querySelector(".badge-toggle.active");
+      return active ? active.dataset.intent : "vibe";
+    }
+
+    function buildPlaylistLinks(coreKey, activity, energy, moodText) {
+      const profile = moodProfiles[coreKey] || moodProfiles.calm;
+      const intentKey = getSelectedIntent();
+      const flavor = intentFlavors[intentKey] || intentFlavors.vibe;
+
+      const baseMood = moodText.trim() ? moodText.trim() : profile.label;
+      const energyWord =
+        energy <= 3 ? "super soft" : energy <= 6 ? "medium energy" : "high energy";
+
+      const sharedTag = `${baseMood} • ${energyWord} • ${activity}`;
+
+      // Use search URLs so it always works without API keys
+      const ytQuery =
+        encodeURIComponent(profile.youtubeQuery + " " + baseMood + " " + activity);
+      const spQuery =
+        encodeURIComponent(profile.spotifyQuery + " " + baseMood + " " + activity);
+
+      return [
+        {
+          name: "YouTube — instant mix for your mood",
+          platform: "YouTube",
+          mood: sharedTag,
+          url: "https://www.youtube.com/results?search_query=" + ytQuery
+        },
+        {
+          name: "Spotify — curated mood search",
+          platform: "Spotify",
+          mood: sharedTag,
+          url: "https://open.spotify.com/search/" + spQuery
+        }
+      ];
+    }
+
+    function randomItem(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function buildTrackConcept(coreKey, energy, moodText, activity, customTitle) {
+      const profile = moodProfiles[coreKey] || moodProfiles.calm;
+      const intentKey = getSelectedIntent();
+      const flavor = intentFlavors[intentKey] || intentFlavors.vibe;
+
+      const energyWords =
+        energy <= 3
+          ? "slow, weightless and almost whisper-quiet"
+          : energy <= 6
+          ? "steady, head-nod tempo with gentle movement"
+          : "explosive, dance-ready and boldly rhythmic";
+
+      const baseMood = moodText.trim()
+        ? moodText.trim()
+        : "your current emotional frequency";
+
+      const titlePoolAdjectives = [
+        "Midnight",
+        "Pixel",
+        "Neon",
+        "Soft",
+        "Silent",
+        "Glass",
+        "Infinite",
+        "Rainy",
+        "Electric",
+        "Velvet"
+      ];
+      const titlePoolNouns = [
+        "Echoes",
+        "Loops",
+        "Diary",
+        "Dreams",
+        "Heartbeat",
+        "Library",
+        "Signals",
+        "Windows",
+        "Whispers",
+        "Ocean"
+      ];
+
+      const autoTitle =
+        randomItem(titlePoolAdjectives) + " " + randomItem(titlePoolNouns);
+      const finalTitle = customTitle.trim() ? customTitle.trim() : autoTitle;
+
+      const lyricSet = lyricFragments[coreKey] || lyricFragments.calm;
+      const lines = [];
+      const used = new Set();
+      while (lines.length < 4 && used.size < lyricSet.length) {
+        const pick = randomItem(lyricSet);
+        if (!used.has(pick)) {
+          used.add(pick);
+          lines.push(pick);
+        }
+      }
+
+      const prompt = [
+        `Create an original ${profile.genres[0]} track titled "${finalTitle}".`,
+        `Mood: ${baseMood}.`,
+        `Energy: ${energy}/10 (${energyWords}).`,
+        `Context: ${activity}, listener wants ${intentKey} (${flavor}).`,
+        `Sound palette: ${profile.textures}.`,
+        `Keep it ${intentKey === "focus" || intentKey === "sleep" ? "mostly instrumental and non-intrusive" : "melodic with memorable hooks"}.`
+      ].join(" ");
+
+      return {
+        title: finalTitle,
+        moodLine: `${profile.label} • ${activity} • energy ${energy}/10`,
+        genres: profile.genres.join(", "),
+        tempo: profile.tempo,
+        textures: profile.textures,
+        flavor,
+        lyricSketch: lines.join("\n"),
+        prompt
+      };
+    }
+
+    // ------- UI rendering -------
+
+    function renderPlaylists(list, summaryText) {
+      const container = $("playlistResults");
+      const summary = $("playlistSummary");
+      summary.textContent = summaryText;
+
+      if (!list || !list.length) {
+        container.innerHTML =
+          '<div class="empty-state">No playlists found. Try describing your mood again.</div>';
+        return;
+      }
+
+      const html = list
+        .map(
+          (p) => `
+        <a class="playlist-link" href="${p.url}" target="_blank" rel="noopener noreferrer">
+          <div class="playlist-item">
+            <div class="playlist-main">
+              <span class="playlist-name">${p.name}</span>
+              <span class="playlist-platform">${p.platform}</span>
+            </div>
+            <div class="playlist-mood">${p.mood}</div>
+            <div class="subtle">${p.note || "Opens in a new tab."}</div>
+          </div>
+        </a>`
+        )
+        .join("");
+
+      container.innerHTML = html;
+    }
+
+    function renderTrackConcept(concept) {
+      const container = $("trackResults");
+      const summary = $("trackSummary");
+      summary.textContent =
+        "Copy–paste this into your favourite AI music generator, or send it to a producer.";
+
+      container.innerHTML = `
+        <div class="meta-row">
+          <div class="meta-item"><strong>Title:</strong> ${concept.title}</div>
+          <div class="meta-item">${concept.moodLine}</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Genres:</strong> ${concept.genres}</div>
+          <div class="meta-item"><strong>Tempo:</strong> ${concept.tempo}</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-item"><strong>Texture:</strong> ${concept.textures}</div>
+          <div class="meta-item"><strong>Blue-ocean twist:</strong> ${concept.flavor}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; margin-top:4px; margin-bottom:2px; color:#e0d7ff;"><strong>Lyric sketch</strong></div>
+          <div class="lyrics-block">${concept.lyricSketch}</div>
+        </div>
+        <div style="margin-top:7px;">
+          <div style="font-size:0.75rem; margin-bottom:2px; color:#e0d7ff;"><strong>AI music prompt</strong></div>
+          <div class="subtle" style="user-select:text;">${concept.prompt}</div>
+        </div>
+      `;
+    }
+
+    function showError(text) {
+      const el = $("formError");
+      if (!text) {
+        el.style.display = "none";
+        el.textContent = "";
+      } else {
+        el.style.display = "block";
+        el.textContent = text;
+      }
+    }
+
+    // ------- Event wiring -------
+
+    $("energy").addEventListener("input", (e) => {
+      $("energyValue").textContent = e.target.value;
+    });
+
+    document
+      .getElementById("intentBadges")
+      .addEventListener("click", (event) => {
+        const btn = event.target.closest(".badge-toggle");
+        if (!btn) return;
+        document
+          .querySelectorAll(".badge-toggle")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+
+    $("btnGeneratePlaylists").addEventListener("click", () => {
+      showError("");
+
+      const moodText = $("moodText").value;
+      const moodType = $("moodType").value;
+      const activity = $("activity").value;
+      const energy = Number($("energy").value || 4);
+
+      if (!moodText.trim()) {
+        showError("Give us at least one word about how you feel right now.");
+        return;
+      }
+
+      const playlists = buildPlaylistLinks(moodType, activity, energy, moodText);
+      const summary = `We analysed your mood and linked you to live ${moodProfiles[moodType].label} journeys for ${activity}.`;
+
+      renderPlaylists(playlists, summary);
+    });
+
+    $("btnGenerateTrack").addEventListener("click", () => {
+      showError("");
+
+      const moodText = $("moodText").value;
+      const moodType = $("moodType").value;
+      const activity = $("activity").value;
+      const energy = Number($("energy").value || 4);
+      const customTitle = $("songTitleInput").value;
+
+      const concept = buildTrackConcept(
+        moodType,
+        energy,
+        moodText,
+        activity,
+        customTitle
+      );
+      renderTrackConcept(concept);
+    });
+  </script>
+</body>
+</html>
